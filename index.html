@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book My Salon - Home</title>
+
+  <!-- Link your existing global styles (make sure this file exists in same folder) -->
+  <link rel="stylesheet" href="global.css">
+
+  <!-- Optional: manifest for PWA (uncomment if you add manifest.json) -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
+
+  <!-- Theme color for mobile browsers -->
+  <meta name="theme-color" content="#F97316">
+
+  <style>
+    /* ===== frontpage-specific styles (kept from your file) ===== */
+    .hero-quote-section {
+      position: relative;
+      text-align: center;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      min-height: 450px;
+      padding: 2rem;
+    }
+    .hero-quote-section .hero-image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 1;
+    }
+    .hero-quote-section img.hero-background-image {
+      position: absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
+    }
+    .hero-quote-section h1{
+      font-size: 3rem;
+      margin-bottom:1rem;
+      z-index:2;
+      position:relative;
+    }
+    .hero-quote-section p{
+      font-size:1.3rem;
+      margin-bottom:2rem;
+      z-index:2;
+      position:relative;
+    }
+    .quote-cta{
+      display:inline-block;
+      padding:1rem 2rem;
+      background-color:var(--primary-color, #f97316);
+      color:var(--button-text, #fff);
+      text-decoration:none;
+      font-weight:bold;
+      border-radius:8px;
+      transition:background-color .25s ease;
+      z-index:2;
+      position:relative;
+    }
+    .quote-cta:hover{ background-color:var(--primary-color-dark,#e05b06); }
+
+    .all-services-section{ padding:2rem; text-align:center; }
+    .all-services-section h2{ font-size:2rem; margin-bottom:2rem; color:var(--text-primary,#111); }
+
+    .services-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap:1.5rem;
+      justify-content:center;
+    }
+    .service-card{
+      background-color:var(--card-bg,#fff);
+      border-radius:var(--border-radius,10px);
+      box-shadow:var(--shadow-medium, 0 4px 14px rgba(0,0,0,0.06));
+      overflow:hidden;
+      transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+    }
+    .service-card:hover{ transform:translateY(-5px); box-shadow:var(--shadow-hover, 0 8px 26px rgba(0,0,0,0.12)); }
+    .service-card img{ width:100%; height:200px; object-fit:cover; display:block; }
+    .service-card h3{ font-size:1.25rem; margin:1rem 0 0.5rem; color:var(--primary-color,#f97316); }
+    .service-card p{ font-size:0.95rem; color:var(--text-secondary,#666); padding:0 1rem 1rem; }
+
+    /* header/footer small layout */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:1rem 1.5rem;
+      background:var(--bg-primary,#fff);
+      box-shadow:0 1px 0 rgba(0,0,0,0.03);
+      position:sticky;
+      top:0;
+      z-index:50;
+    }
+    header .logo{ font-weight:700; color:var(--primary-color,#f97316); text-decoration:none; font-size:1.2rem; }
+    .header-controls{ display:flex; gap:1rem; align-items:center; }
+    .header-actions .btn{ margin-left:.6rem; padding:.45rem .8rem; border-radius:6px; text-decoration:none; color:#fff; background:var(--primary-color,#f97316); }
+    .auth-buttons .btn{ background:var(--accent-secondary,#0ea5ae); }
+
+    footer{ text-align:center; padding:1.25rem 1rem; color:var(--text-secondary,#666); font-size:.95rem; border-top:1px solid rgba(0,0,0,0.04); margin-top:2rem; }
+
+    @media (max-width:768px){
+      .hero-quote-section h1{ font-size:2.2rem; }
+      .hero-quote-section p{ font-size:1rem; }
+      header{ padding:.6rem 0.9rem; }
+      .services-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body data-theme="light">
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="index.html">Book My Salon</a>
+
+    <div class="header-controls">
+      <div class="header-actions">
+        <!-- Use same file names you already have in your project -->
+        <a class="btn" href="salon-register.html">Register as Partner</a>
+        <div class="auth-buttons" style="display:inline-block; margin-left:0.6rem;">
+          <a class="btn" href="login.html" style="background:#10b981;">Login</a>
+          <a class="btn" href="userinfo.html" style="background:#06b6d4;">Sign Up</a>
+        </div>
+      </div>
+
+      <!-- Theme toggle uses your existing theme-switcher.js -->
+      <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode" style="margin-left:12px;">🌙</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main>
+    <section class="hero-quote-section" role="region" aria-label="Hero">
+      <!-- Use same 'images' folder. If missing, it will fallback to alt text. -->
+      <img class="hero-background-image" src="images/style-pamper-glow.png" alt="Style, Pamper, Glow - background" onerror="this.style.display='none'">
+      <div class="hero-image-overlay" aria-hidden="true"></div>
+
+      <h1>Style. Pamper. Glow.</h1>
+      <p>Book your favorite salon services with ease and convenience.</p>
+
+      <!-- Button to user form / signup / booking -->
+      <a class="quote-cta" href="userinfo.html" role="button">Book Now</a>
+    </section>
+
+    <!-- FEATURED SERVICES -->
+    <section class="all-services-section" aria-labelledby="featured-services">
+      <h2 id="featured-services">Featured Services</h2>
+
+      <div class="services-grid" id="servicesGrid">
+        <!-- Keep markup same as your original — easy to expand dynamically later -->
+        <div class="service-card">
+          <img src="images/haircut.jpg" alt="Haircut service" onerror="this.src='https://via.placeholder.com/600x400?text=Haircut'">
+          <h3>Haircut</h3>
+          <p>Expert hair cutting and styling by professionals.</p>
+        </div>
+
+        <div class="service-card">
+          <img src="images/facial.jpg" alt="Facial service" onerror="this.src='https://via.placeholder.com/600x400?text=Facial'">
+          <h3>Facial</h3>
+          <p>Rejuvenate your skin with our premium facial treatments.</p>
+        </div>
+
+        <div class="service-card">
+          <img src="images/manicure.jpg" alt="Manicure and Pedicure service" onerror="this.src='https://via.placeholder.com/600x400?text=Manicure'">
+          <h3>Manicure &amp; Pedicure</h3>
+          <p>Pamper your hands and feet with our relaxing services.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2024 Book My Salon. All rights reserved.</p>
+  </footer>
+
+  <!-- Use your existing theme-switcher script (keeps behavior from other pages) -->
+  <script src="theme-switcher.js"></script>
+
+  <!-- Small helper to ensure the themeToggle button shows correct icon on load -->
+  <script>
+    (function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      const saved = localStorage.getItem('theme') || body.getAttribute('data-theme') || 'light';
+      body.setAttribute('data-theme', saved);
+      if(themeToggle) themeToggle.textContent = saved === 'dark' ? '☀️' : '🌙';
+      if(themeToggle){
+        themeToggle.addEventListener('click', () => {
+          const cur = body.getAttribute('data-theme') || 'light';
+          const next = cur === 'light' ? 'dark' : 'light';
+          body.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+          themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

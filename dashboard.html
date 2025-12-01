@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Book My Salon</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /*
+         * NOTE: It's generally better to move these to global.css if they are common
+         * or to a dashboard.css if specific only to this page and complex.
+         * For now, keeping here as requested, but minimal.
+         */
+
+        /* Styles for the main content area */
+        main {
+            margin-left: 240px; /* Default margin to accommodate the expanded sidebar */
+            transition: margin-left 0.3s ease; /* Smooth transition for sidebar expand/collapse */
+            flex: 1; /* Allows main to take available space in a flex container */
+            padding: 2rem; /* Padding around the main content */
+            display: flex; /* Using flexbox for layout within main */
+            flex-direction: column; /* Stacks children vertically */
+            min-height: calc(100vh - 80px); /* Ensures main takes up most of the viewport height,
+                                                accounting for header/footer (assuming 40px each) */
+        }
+
+        /* Adjust main content margin when the sidebar is collapsed */
+        body.sidebar-collapsed main {
+            margin-left: 60px; /* Reduced margin for collapsed sidebar */
+        }
+
+        /* Adjust main content for mobile screens (sidebar hidden or overlayed) */
+        @media (max-width: 768px) {
+            main {
+                margin-left: 0; /* No margin on mobile when sidebar is not active */
+                padding: 1rem; /* Reduced padding for smaller screens */
+            }
+            body.sidebar-active main {
+                /* When sidebar is open on mobile, main content might be pushed or covered.
+                   This specific styling is often handled by an overlay in global.css,
+                   rather than direct margin adjustments on 'main'. */
+            }
+        }
+
+        /* Styling for the central dashboard content section */
+        .dashboard-content {
+            text-align: center; /* Centers text and inline-block elements */
+            padding: 3rem 2rem; /* Generous padding inside the content card */
+            background: var(--card-bg); /* Background color from CSS variables */
+            border-radius: var(--border-radius); /* Rounded corners from CSS variables */
+            box-shadow: var(--shadow-medium); /* Medium shadow for depth from CSS variables */
+            max-width: 800px; /* Limits the maximum width of the content */
+            margin: 0 auto; /* Centers the block horizontally */
+            flex-grow: 1; /* Allows this section to grow and push the footer down */
+        }
+
+        /* Styling for the main heading in the dashboard content */
+        .dashboard-content h2 {
+            font-size: 2.5rem; /* Large font size for prominent heading */
+            margin-bottom: 1.5rem; /* Space below the heading */
+            color: var(--accent-primary); /* Primary accent color from CSS variables */
+        }
+
+        /* Styling for the container holding primary action buttons */
+        .action-buttons-container {
+            display: flex; /* Uses flexbox for button layout */
+            flex-wrap: wrap; /* Allows buttons to wrap to the next line on smaller screens */
+            justify-content: center; /* Centers the buttons horizontally */
+            gap: 1.5rem; /* Space between the buttons */
+            margin-top: 2rem; /* Space above the button container */
+            margin-bottom: 2rem; /* Space below the button container */
+        }
+
+        /* Base styling for all action buttons */
+        .action-button {
+            padding: 1rem 2rem; /* Padding inside the button */
+            border: none; /* No border */
+            border-radius: var(--border-radius); /* Rounded corners */
+            font-weight: bold; /* Bold text */
+            cursor: pointer; /* Changes cursor to a pointer on hover */
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            text-decoration: none; /* Removes underline for anchor tags used as buttons */
+            color: white; /* Default text color */
+            font-size: 1.1rem; /* Font size for button text */
+            min-width: 220px; /* Ensures buttons have a minimum width */
+            text-align: center; /* Centers text within the button */
+            display: inline-flex; /* Allows icon and text to align nicely */
+            align-items: center; /* Vertically aligns icon and text */
+            justify-content: center; /* Horizontally aligns icon and text */
+        }
+
+        /* Styling for icons within action buttons */
+        .action-button i {
+            margin-right: 0.75rem; /* Space between the icon and button text */
+            font-size: 1.3rem; /* Slightly larger font size for icons */
+        }
+
+        /* Specific styling for the primary action button */
+        .action-button.primary {
+            background-color: var(--accent-primary); /* Primary accent color for background */
+            color: white; /* White text color */
+            box-shadow: var(--shadow-small); /* Small shadow */
+        }
+
+        /* Hover effect for the primary action button */
+        .action-button.primary:hover {
+            background-color: var(--accent-dark); /* Darker accent on hover */
+            transform: translateY(-2px); /* Lifts the button slightly */
+            box-shadow: var(--shadow-medium); /* Larger shadow on hover */
+        }
+
+        /* Specific styling for the secondary action button (e.g., Register Salon) */
+        .action-button.secondary {
+            background-color: #28a745; /* A standard green color */
+            color: white; /* White text color */
+            box-shadow: var(--shadow-small); /* Small shadow */
+        }
+
+        /* Hover effect for the secondary action button */
+        .action-button.secondary:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px); /* Lifts the button slightly */
+            box-shadow: var(--shadow-medium); /* Larger shadow on hover */
+        }
+
+
+        /* --- NEW CSS FOR RECOMMENDATIONS --- */
+        .recommendations-section {
+            margin-top: 3rem; /* Space above the recommendations section */
+            text-align: left; /* Aligns text to the left */
+            border-top: 1px solid var(--border-color); /* Top border for separation */
+            padding-top: 2rem; /* Padding above the content in this section */
+        }
+        /* Styling for the heading within the recommendations section */
+        .recommendations-section h2 {
+            font-size: 1.8rem; /* Font size for the heading */
+            color: var(--text-heading); /* Heading text color from CSS variables */
+            margin-bottom: 1.5rem; /* Space below the heading */
+            text-align: center; /* Centers the heading */
+        }
+        /* Grid layout for displaying service recommendation cards */
+        .services-grid {
+            display: grid; /* Uses CSS Grid for layout */
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns,
+                                                                                at least 200px wide */
+            gap: 1.5rem; /* Space between grid items (service cards) */
+        }
+        /* Styling for individual service recommendation cards */
+        .service-card-rec {
+            background: var(--bg-secondary); /* Secondary background color from CSS variables */
+            border-radius: var(--border-radius); /* Rounded corners */
+            padding: 1.5rem; /* Padding inside the card */
+            box-shadow: var(--shadow-small); /* Small shadow */
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            text-align: left; /* Ensures text is left-aligned within the card */
+            border: 1px solid var(--border-color); /* Added border for better separation */
+        }
+        /* Hover effect for service recommendation cards */
+        .service-card-rec:hover {
+            transform: translateY(-3px); /* Lifts the card slightly */
+            box-shadow: var(--shadow-medium); /* Larger shadow on hover */
+        }
+        /* Styling for service name in the recommendation card */
+        .service-card-rec h3 {
+            font-size: 1.2rem; /* Font size for service name */
+            color: var(--accent-primary); /* Primary accent color */
+            margin-top: 0; /* No top margin */
+            margin-bottom: 0.5rem; /* Space below service name */
+        }
+        /* Styling for service details (price, bookings) in the recommendation card */
+        .service-card-rec p {
+            font-size: 1rem; /* Standard font size */
+            color: var(--text-secondary); /* Secondary text color */
+            margin-bottom: 0.5rem; /* Space below paragraphs */
+        }
+        /* --- END NEW CSS --- */
+
+        /* --- NEW CSS FOR CHATBOT TOGGLE (ROBOT ICON) --- */
+        /* Styling for the floating chatbot bubble icon */
+        .chatbot-bubble {
+            position: fixed; /* Fixed position relative to the viewport */
+            bottom: 20px; /* 20px from the bottom */
+            right: 20px; /* 20px from the right */
+            width: 60px; /* Fixed width */
+            height: 60px; /* Fixed height */
+            background-color: var(--accent-primary); /* Primary accent color */
+            color: white; /* White icon color */
+            border-radius: 50%; /* Makes it a perfect circle */
+            display: flex; /* Uses flexbox for centering the icon */
+            justify-content: center; /* Centers icon horizontally */
+            align-items: center; /* Centers icon vertically */
+            font-size: 1.8rem; /* Font size for the icon (adjusted for robot) */
+            cursor: pointer; /* Changes cursor to a pointer on hover */
+            box-shadow: var(--shadow-medium); /* Medium shadow */
+            z-index: 1000; /* Ensures it stays on top of most content */
+            transition: transform 0.2s ease, background-color 0.3s ease; /* Smooth transitions */
+        }
+
+        /* Hover effect for the chatbot bubble */
+        .chatbot-bubble:hover {
+            transform: scale(1.05); /* Slightly enlarges the bubble */
+            background-color: var(--accent-dark); /* Darker accent on hover */
+        }
+
+        /* Specific styling for the Font Awesome robot icon */
+        .chatbot-bubble .fas.fa-robot {
+            font-size: 1.8rem; /* Explicit font size for the robot icon */
+        }
+
+        /* Styling for the chatbot window itself */
+        .chatbot-window {
+            position: fixed; /* Fixed position */
+            bottom: 90px; /* Above the chatbot bubble */
+            right: 20px; /* Aligned with the bubble */
+            width: 350px; /* Fixed width */
+            height: 500px; /* Fixed height */
+            background-color: var(--card-bg); /* Background color from CSS variables */
+            border-radius: var(--border-radius); /* Rounded corners */
+            box-shadow: var(--shadow-large); /* Large shadow for prominence */
+            display: flex; /* Uses flexbox for internal layout */
+            flex-direction: column; /* Stacks header, messages, input vertically */
+            z-index: 999; /* Below the bubble, but above main content */
+            overflow: hidden; /* Hides content that overflows (e.g., rounded corners) */
+            transform: translateY(10px) scale(0.95); /* Initial state: slightly down, smaller */
+            opacity: 0; /* Initially invisible */
+            pointer-events: none; /* Prevents interaction when closed */
+            transition: all 0.3s ease-in-out; /* Smooth open/close animation */
+        }
+
+        /* State when the chatbot window is open */
+        .chatbot-window.open {
+            transform: translateY(0) scale(1); /* Moves to original position and full size */
+            opacity: 1; /* Fully visible */
+            pointer-events: auto; /* Allows interaction */
+        }
+
+        /* Styling for the chatbot header */
+        .chatbot-header {
+            background-color: var(--accent-primary); /* Primary accent background */
+            color: white; /* White text color */
+            padding: 15px; /* Padding inside the header */
+            border-top-left-radius: var(--border-radius); /* Matches window border radius */
+            border-top-right-radius: var(--border-radius); /* Matches window border radius */
+            display: flex; /* Uses flexbox for title and close button */
+            justify-content: space-between; /* Puts space between title and close button */
+            align-items: center; /* Vertically aligns title and close button */
+        }
+
+        /* Styling for the chatbot header title */
+        .chatbot-header h3 {
+            margin: 0; /* No margin for the heading */
+            font-size: 1.2rem; /* Font size for the title */
+        }
+
+        /* Styling for the chatbot close button */
+        .chatbot-header .close-btn {
+            background: none; /* No background */
+            border: none; /* No border */
+            color: white; /* White text color */
+            font-size: 1.5rem; /* Large font size for 'X' */
+            cursor: pointer; /* Changes cursor to pointer */
+        }
+
+        /* Styling for the chatbot messages container */
+        .chatbot-messages {
+            flex-grow: 1; /* Allows message area to take available space */
+            padding: 15px; /* Padding inside the message area */
+            overflow-y: auto; /* Enables vertical scrolling if content overflows */
+            background-color: var(--bg-secondary); /* Secondary background color */
+            border-bottom: 1px solid var(--border-color); /* Bottom border for separation */
+        }
+
+        /* Base styling for individual chat messages */
+        .chatbot-message {
+            margin-bottom: 10px; /* Space between messages */
+            max-width: 80%; /* Limits message width to 80% of container */
+            padding: 10px 15px; /* Padding inside the message bubble */
+            border-radius: 15px; /* Rounded corners for message bubbles */
+            word-wrap: break-word; /* Prevents long words from overflowing */
+        }
+
+        /* Styling for user's messages */
+        .chatbot-message.user {
+            background-color: var(--accent-light); /* Light accent background */
+            color: var(--text-color); /* Standard text color */
+            margin-left: auto; /* Pushes user messages to the right */
+            border-bottom-right-radius: 2px; /* Small radius on the bottom-right for a pointed look */
+        }
+
+        /* Styling for bot's messages */
+        .chatbot-message.bot {
+            background-color: var(--primary-color); /* Primary color background */
+            color: white; /* White text color */
+            margin-right: auto; /* Pushes bot messages to the left */
+            border-bottom-left-radius: 2px; /* Small radius on the bottom-left for a pointed look */
+        }
+        
+        /* Specific styling for bot recommendation messages */
+        .chatbot-message.bot.recommendation-message {
+            background-color: var(--bg-primary); /* Different background for recommendations */
+            color: var(--text-color); /* Standard text color */
+            border: 1px solid var(--border-color); /* Border for emphasis */
+        }
+        /* Specific styling for bot messages that contain action buttons (e.g., Yes/No for navigation) */
+        .chatbot-message.bot.action-prompt {
+            background-color: var(--bg-primary); /* Light background for prompts */
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- START: NEW CSS FOR DEMO SALON BUTTONS (MARPU 1) --- */
+        /* Styling for buttons that represent salon choices within the chatbot */
+        .salon-choice-btn {
+            display: block; /* Makes the button take full width */
+            width: 100%; /* Fits within the message bubble */
+            background-color: var(--primary-color); /* Primary color background */
+            color: var(--button-text-color, white); /* White text, with fallback */
+            border: none; /* No border */
+            border-radius: 8px; /* Slightly rounded corners */
+            padding: 12px; /* Padding inside the button */
+            margin: 5px 0; /* Vertical space between buttons */
+            cursor: pointer; /* Pointer cursor */
+            text-align: left; /* Aligns text to the left */
+            transition: background-color 0.2s ease; /* Smooth background transition */
+        }
+
+        /* Hover effect for salon choice buttons */
+        .salon-choice-btn:hover {
+            background-color: var(--primary-color-dark, #0056b3); /* Darker primary color on hover */
+        }
+
+        /* Styling for small text (e.g., rating, address) within salon choice buttons */
+        .salon-choice-btn small {
+            display: block; /* Makes it a block element for new line */
+            margin-top: 5px; /* Space above the small text */
+            color: var(--button-text-color, white); /* White text color */
+            opacity: 0.9; /* Slightly transparent */
+        }
+
+        /* Styling for chatbot action buttons (e.g., Yes/No for navigation) */
+        .chatbot-action-btn {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .chatbot-action-btn:hover {
+            background-color: var(--accent-dark);
+        }
+        /* --- END: NEW CSS FOR DEMO SALON BUTTONS --- */
+
+
+        /* Styling for the chatbot input area */
+        .chatbot-input {
+            display: flex; /* Uses flexbox for input field and send button */
+            padding: 10px 15px; /* Padding around the input area */
+            border-top: 1px solid var(--border-color); /* Top border for separation */
+            background-color: var(--card-bg); /* Background color */
+        }
+
+        /* Styling for the chat input text field */
+        .chatbot-input input {
+            flex-grow: 1; /* Allows the input field to take available space */
+            padding: 8px 12px; /* Padding inside the input */
+            border: 1px solid var(--border-color); /* Border around the input */
+            border-radius: var(--border-radius); /* Rounded corners */
+            margin-right: 10px; /* Space between input and send button */
+            font-size: 1rem; /* Standard font size */
+            background-color: var(--bg-primary); /* Primary background color */
+            color: var(--text-color); /* Standard text color */
+        }
+        /* Focus effect for the chat input field */
+        .chatbot-input input:focus {
+            outline: none; /* Removes default outline */
+            border-color: var(--accent-primary); /* Changes border color to accent primary */
+            box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2); /* Light shadow on focus */
+        }
+
+        /* Styling for the chatbot send button */
+        .chatbot-input button {
+            background-color: var(--accent-primary); /* Primary accent background */
+            color: white; /* White text color */
+            border: none; /* No border */
+            border-radius: var(--border-radius); /* Rounded corners */
+            padding: 8px 15px; /* Padding inside the button */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s ease; /* Smooth background transition */
+        }
+
+        /* Hover effect for the chatbot send button */
+        .chatbot-input button:hover {
+            background-color: var(--accent-dark); /* Darker accent on hover */
+        }
+
+        /* Styling for recommendation lists within the chatbot */
+        .chatbot-recommendations-list .service-card-rec {
+            margin-bottom: 10px; /* Space between recommendation cards */
+            border: 1px solid var(--border-color); /* Border for each card */
+            background: var(--bg-primary); /* Primary background color */
+        }
+        /* --- END NEW CSS FOR CHATBOT --- */
+
+        /* Responsive adjustments for button container */
+        @media (max-width: 600px) {
+            .action-buttons-container {
+                flex-direction: column; /* Stacks buttons vertically on small screens */
+                gap: 1rem; /* Reduced gap between buttons */
+            }
+            .action-button {
+                width: 90%; /* Makes buttons take 90% width */
+                margin-left: auto; /* Centers buttons horizontally */
+                margin-right: auto;
+            }
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="frontpage.html" class="logo">Book My Salon</a>
+                <button class="toggle-btn" id="toggleBtn" title="Toggle Sidebar">☰</button>
+            </div>
+            <ul>
+                <li data-page="dashboard.html"><a href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li data-page="salons.html"><a href="salons.html"><i class="fas fa-cut"></i><span>Salons</span></a></li>
+                <li data-page="appointments.html"><a href="appointments.html"><i class="fas fa-calendar-check"></i><span>My Appointments</span></a></li>
+                <li data-page="profile.html"><a href="profile.html"><i class="fas fa-user-circle"></i><span>Profile</span></a></li>
+                <li data-page="salon-register.html"><a href="salon-register.html"><i class="fas fa-store-alt"></i><span>Register Salon</span></a></li>
+                <li data-action="logout"><a href="#"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content-area">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    </div>
+                <div class="header-right">
+                    <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+                </div>
+            </header>
+
+            <main>
+                <section class="dashboard-content">
+                    <!-- Initial heading set to a neutral default; script will replace if localStorage has userName -->
+                    <h2 id="userName">Welcome!</h2>
+                    <p>Your personalized dashboard content will appear here.</p>
+                    
+                    <div class="action-buttons-container">
+                        <a href="salons.html" class="action-button primary">
+                            <i class="fas fa-calendar-alt"></i> Book a New Appointment
+                        </a>
+                        <a href="salon-register.html" class="action-button secondary">
+                            <i class="fas fa-store"></i> Register Your Salon
+                        </a>
+                    </div>
+                    
+                    <section class="recommendations-section">
+                        <h2>Popular Services You Might Like</h2>
+                        <div id="popularServicesContainer" class="services-grid">
+                            <p>Loading recommendations...</p>
+                        </div>
+                    </section>
+                    <p style="margin-top: 2rem;">Use the navigation on the left to explore more.</p>
+                </section>
+            </main>
+
+            <footer>
+                <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+            </footer>
+        </div>
+    </div> 
+
+    <div class="chatbot-bubble" id="chatbotBubble">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <h3>Salon AI Assistant</h3>
+            <button class="close-btn" id="closeChatbot">&times;</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chatbot-message bot">Hello! How can I assist you today? Try typing "recommend services" or "find salons near me".</div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Type your message..." />
+            <button id="sendChatBtn">Send</button>
+        </div>
+    </div>
+    <script src="theme-switcher.js"></script>
+    <script>
+        // === CONFIGURATION ===
+        const API_BASE_URL = 'http://localhost:3000'; // Base URL for API calls
+
+        // --- START: CHATBOT DEMO SALON DATA (MODIFIED - REDUCED TO 3 SALONS) ---
+        const chatbotDemoSalons = [
+            {
+                id: 'demo1',
+                name: 'Option The Salon',
+                address: 'Plot 2, VIP Road, Raipur',
+                rating: 4.5,
+                services: [ { name: 'Haircut', price: 250 }, { name: 'Facial', price: 800 } ]
+            },
+            {
+                id: 'demo6',
+                name: 'Urban Edge Salon',
+                address: 'Sector 27, Central Avenue, Naya Raipur',
+                rating: 4.7,
+                services: [ { name: 'Haircut', price: 300 }, { name: 'Beard Trim', price: 200 } ]
+            },
+            {
+                id: 'demo11',
+                name: 'Luxury Spa & Salon',
+                address: 'VIP Road, Shankar Nagar, Raipur',
+                rating: 4.9,
+                services: [ { name: 'Full Body Spa', price: 3000 }, { name: 'Hair Color', price: 2000 } ]
+            }
+        ];
+
+        async function loadPopularServices() {
+            const container = document.getElementById('popularServicesContainer');
+            if (!container) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/salons/popular-services`);
+                const data = await response.json();
+
+                if (response.ok && data.success && data.services.length > 0) {
+                    container.innerHTML = '';
+                    data.services.forEach(service => {
+                        const card = document.createElement('div');
+                        card.className = 'service-card-rec';
+                        card.innerHTML = `
+                            <h3>${service.name}</h3>
+                            <p>Price: ₹${service.price}</p>
+                            <p>Booked ${service.count} times!</p>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<p>No popular services to display at this time.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading popular services:', error);
+                container.innerHTML = '<p>Error loading recommendations.</p>';
+            }
+        }
+
+        // CHATBOT LOGIC
+        const chatbotBubble = document.getElementById('chatbotBubble');
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        const closeChatbotBtn = document.getElementById('closeChatbot');
+        const chatInput = document.getElementById('chatInput');
+        const sendChatBtn = document.getElementById('sendChatBtn');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+
+        function toggleChatbot() {
+            chatbotWindow.classList.toggle('open');
+        }
+
+        function addMessage(message, sender, type = '') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chatbot-message ${sender} ${type}`;
+            messageDiv.innerHTML = message;
+            chatbotMessages.appendChild(messageDiv);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function addSalonChoiceButton(salon) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chatbot-message bot';
+            messageElement.innerHTML = `
+                <button class="salon-choice-btn" data-id="${salon.id}" data-name="${salon.name}">
+                    <strong>${salon.name}</strong>
+                    <small>⭐ ${salon.rating || 'N/A'} | ${salon.address}</small>
+                </button>
+            `;
+            chatbotMessages.appendChild(messageElement);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function showDemoSalonFallback(message) {
+            if (chatbotDemoSalons.length > 0) {
+                addMessage(message, 'bot');
+                chatbotDemoSalons.forEach(salon => addSalonChoiceButton(salon));
+            } else {
+                addMessage('<p>Sorry, I couldn\'t find any registered salons within 10km of your location.</p>', 'bot');
+            }
+        }
+
+        async function getBotResponse(userMessage) {
+            let botResponse = "I'm sorry, I don't understand that. You can try 'recommend services' or 'find salons near me'.";
+            let botMessageType = 'bot';
+
+            const lowerUserMessage = userMessage.toLowerCase();
+
+            if (lowerUserMessage.includes("near me") || lowerUserMessage.includes("nearby") || lowerUserMessage.includes("find salons")) {
+                botMessageType = 'bot recommendation-message';
+                addMessage("Okay, trying to find salons near you. Please allow location access if prompted.", 'bot');
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        addMessage(`Your location: Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}. Searching...`, 'bot');
+
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/salons/near-me?lat=${lat}&lon=${lon}`);
+                            const data = await response.json();
+
+                            if (response.ok && data.success && data.salons.length > 0) {
+                                const salonsHtml = data.salons.map(salon => `
+                                    <div class="service-card-rec">
+                                        <h3>${salon.salonName}</h3>
+                                        <p>${salon.address}</p>
+                                        <p>Distance: ${salon.distance ? salon.distance.toFixed(2) + ' km' : 'N/A'}</p>
+                                        <a href="salon-details.html?id=${salon._id}" class="chatbot-action-btn" style="text-decoration: none;">View Details</a>
+                                    </div>
+                                `).join('');
+                                botResponse = `<p>Here are the 5 closest salons I found:</p><div class="chatbot-recommendations-list">${salonsHtml}</div>`;
+                                addMessage(botResponse, botMessageType);
+                            } else {
+                                showDemoSalonFallback('<p>Sorry, I couldn\'t find any registered salons nearby. Here are some popular demo salons instead:</p>');
+                            }
+                        } catch (error) {
+                            console.error('Error fetching nearby salons for chatbot:', error);
+                            showDemoSalonFallback('<p>Sorry, I had trouble searching for nearby salons. Here are some popular demo salons instead:</p>');
+                        }
+                    }, (error) => {
+                        console.error('Geolocation error:', error.message);
+                        let errorMessage = "I couldn't get your location. Please ensure you allow location access in your browser settings.";
+                        if (error.code === error.PERMISSION_DENIED) {
+                            errorMessage = "You denied location access. To find salons near you, please enable location services for this site in your browser settings.";
+                        }
+                        showDemoSalonFallback(errorMessage + ' In the meantime, here are some popular demo salons:');
+                    });
+                } else {
+                    addMessage("Sorry, your browser does not support Geolocation.", 'bot');
+                }
+                return;
+            } else if (lowerUserMessage.includes("hello") || lowerUserMessage.includes("hi")) {
+                botResponse = "Hello there! How can I help you today?";
+            } else if (lowerUserMessage.includes("recommend services") || lowerUserMessage.includes("suggest services") || lowerUserMessage.includes("popular")) {
+                botMessageType = 'bot recommendation-message';
+                addMessage("Sure, fetching popular services for you...", 'bot');
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/salons/popular-services`);
+                    const data = await response.json();
+
+                    if (response.ok && data.success && data.services.length > 0) {
+                        const servicesHtml = data.services.map(service => `
+                            <div class="service-card-rec">
+                                <h3>${service.name}</h3>
+                                <p>Price: ₹${service.price}</p>
+                                <p>Booked ${service.count} times!</p>
+                            </div>
+                        `).join('');
+                        botResponse = `<p>Here are some of the most popular services:</p><div class="chatbot-recommendations-list">${servicesHtml}</div>`;
+                    } else {
+                        botResponse = '<p>No popular services available at the moment.</p>';
+                    }
+                } catch (error) {
+                    console.error('Error fetching services for chatbot:', error);
+                    botResponse = '<p>Sorry, I could not fetch recommendations right now.</p>';
+                }
+            } else if (lowerUserMessage.includes("thank you") || lowerUserMessage.includes("thanks")) {
+                botResponse = "You're welcome! Is there anything else I can help you with?";
+            }
+
+            addMessage(botResponse, botMessageType);
+        }
+
+        if (chatbotBubble) {
+            chatbotBubble.addEventListener('click', toggleChatbot);
+        }
+        if (closeChatbotBtn) {
+            closeChatbotBtn.addEventListener('click', toggleChatbot);
+        }
+        if (sendChatBtn) {
+            sendChatBtn.addEventListener('click', () => {
+                const userMessage = chatInput.value.trim();
+                if (userMessage) {
+                    addMessage(userMessage, 'user');
+                    chatInput.value = '';
+                    setTimeout(() => {
+                        getBotResponse(userMessage);
+                    }, 500);
+                }
+            });
+        }
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatBtn.click();
+                }
+            });
+        }
+
+        // Event delegation for buttons added inside the chat
+        chatbotMessages.addEventListener('click', (event) => {
+            const clickedSalonButton = event.target.closest('.salon-choice-btn');
+            const clickedActionButton = event.target.closest('.chatbot-action-btn');
+
+            if (clickedSalonButton) {
+                const salonId = clickedSalonButton.dataset.id;
+                const salonName = clickedSalonButton.dataset.name;
+
+                addMessage(`Great choice! Here are the details for <strong>${salonName}</strong>. Do you want to go to the details page for this salon?
+                    <br><button class="chatbot-action-btn" data-action="view-details" data-id="${salonId}">Yes</button>
+                    <button class="chatbot-action-btn" data-action="no-details">No</button>
+                `, 'bot action-prompt');
+            } else if (clickedActionButton) {
+                const action = clickedActionButton.dataset.action;
+                const salonId = clickedActionButton.dataset.id;
+
+                if (action === 'view-details' && salonId) {
+                    addMessage("Redirecting to salon details...", 'bot');
+                    console.log('Chatbot redirect to salon-details.html with id=', salonId);
+                    // IMPORTANT: use the correct file name (with hyphen)
+                    window.location.href = `salon-details.html?id=${salonId}`;
+                } else if (action === 'no-details') {
+                    addMessage("Thank you! Is there anything else I can help you with?", 'bot');
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPopularServices();
+            loadUserName();
+        });
+
+        // ----- UPDATED loadUserName() - reads localStorage first, then tries API -----
+        async function loadUserName() {
+            const userNameElement = document.getElementById('userName');
+            if (!userNameElement) return;
+
+            // 1) Immediate: try localStorage first so UI updates instantly for demo/presentation
+            const storedName = localStorage.getItem('userName') || localStorage.getItem('salonName');
+            if (storedName) {
+                userNameElement.textContent = `Welcome, ${storedName}!`;
+            } else {
+                // Neutral default while we try to fetch remote info
+                userNameElement.textContent = 'Welcome!';
+            }
+
+            // 2) If we have a token, try to fetch authoritative name from API
+            const token = localStorage.getItem('authToken') || localStorage.getItem('salonAuthToken');
+            if (!token) return; // no token — nothing more to do
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/user`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const body = await response.json();
+                    // backend returns { success: true, user: { ... } }
+                    const apiName = (body && body.success && body.user && body.user.name) ? body.user.name
+                                    : (body && body.name) ? body.name
+                                    : null;
+                    if (apiName) {
+                        userNameElement.textContent = `Welcome, ${apiName}!`;
+                        // keep localStorage in sync for faster future loads
+                        localStorage.setItem('userName', apiName);
+                    }
+                } else {
+                    // If token invalid/expired, avoid noisy behavior — only clear the token on 401/403
+                    console.error("Failed to fetch user data:", response.status);
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('authToken'); // clear expired/invalid token
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                // network error — keep local name if any, otherwise the neutral 'Welcome!' remains
+            }
+        }
+
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const body = document.body;
+
+        if (toggleBtn && sidebar && body) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                body.classList.toggle('sidebar-collapsed');
+            });
+        }
+
+        const currentPath = window.location.pathname.split('/').pop();
+        const sidebarLinks = document.querySelectorAll('.sidebar ul li');
+        sidebarLinks.forEach(link => {
+            const page = link.dataset.page;
+            if (page === currentPath || (currentPath === '' && page === 'dashboard.html')) {
+                link.classList.add('active');
+            }
+        });
+
+        const logoutLink = document.querySelector('li[data-action="logout"] a');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('salonAuthToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('salonName');
+                window.location.href = 'frontpage.html';
+            });
+        }
+    </script>
+</body>
+</html>
